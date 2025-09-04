@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFNTL导航系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #165DFF;
+            --secondary: #36CFC9;
+            --accent: #722ED1;
+            --dark: #1D2129;
+            --light-bg: #f7f8fa;
+        }
+        
+        body {
+            font-family: 'Inter', 'system-ui', sans-serif;
+            background: linear-gradient(135deg, #f5f7ff 0%, #e3e6ff 100%);
+            color: #1D2129;
+            min-height: 100vh;
+        }
+        
+        .typewriter h1 {
+            overflow: hidden;
+            border-right: .15em solid var(--primary);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .1em;
+            animation: typing 3s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary); }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-item:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-item:hover:after {
+            width: 100%;
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(22, 93, 255, 0.2);
+        }
+        
+        .feature-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .minecraft-btn {
+            background: linear-gradient(135deg, #165DFF 0%, #0E4ACC 100%);
+            box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+        }
+        
+        .minecraft-btn:hover {
+            background: linear-gradient(135deg, #0E4ACC 0%, #0A3AA3 100%);
+            box-shadow: 0 6px 16px rgba(22, 93, 255, 0.4);
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            bottom: -10px;
+            left: 20%;
+            border-radius: 2px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-compass text-[#165DFF] text-2xl"></i>
+                <h1 class="text-xl font-bold text-[#1D2129]">VFNTL导航系统</h1>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="nav-item text-[#165DFF] font-medium py-2">首页</a>
+                <a href="#resources" class="nav-item text-gray-600 hover:text-[#165DFF] font-medium py-2">资源导航</a>
+                <a href="#upload" class="nav-item text-gray-600 hover:text-[#165DFF] font-medium py-2">视频上传</a>
+                <a href="#" class="nav-item text-gray-600 hover:text-[#165DFF] font-medium py-2">社区</a>
+                <a href="#" class="nav-item text-gray-600 hover:text-[#165DFF] font-medium py-2">关于</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <button class="bg-[#165DFF] text-white px-4 py-2 rounded-lg btn-hover" onclick="showModal('loginModal')">
+                    <i class="fa fa-user mr-2"></i>登录
+                </button>
+                <button class="md:hidden text-gray-600" onclick="toggleMobileMenu()">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white px-4 py-3 shadow-md">
+            <a href="#" class="block py-2 text-[#165DFF] font-medium">首页</a>
+            <a href="#resources" class="block py-2 text-gray-600 hover:text-[#165DFF]">资源导航</a>
+            <a href="#upload" class="block py-2 text-gray-600 hover:text-[#165DFF]">视频上传</a>
+            <a href="#" class="block py-2 text-gray-600 hover:text-[#165DFF]">社区</a>
+            <a href="#" class="block py-2 text-gray-600 hover:text-[#165DFF]">关于</a>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow">
+        <!-- 欢迎部分 -->
+        <section class="py-16 px-4">
+            <div class="container mx-auto max-w-4xl text-center">
+                <div class="typewriter mb-6">
+                    <h1 class="text-4xl md:text-5xl font-bold text-[#1D2129]">欢迎来到VFNTL导航系统~</h1>
+                </div>
+                <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                    专为《我的世界》玩家打造的一站式资源导航平台，轻松发现优质内容
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 mb-16">
+                    <button class="minecraft-btn text-white px-6 py-3 rounded-lg font-medium btn-hover" onclick="scrollToSection('resources')">
+                        <i class="fa fa-rocket mr-2"></i>开始探索
+                    </button>
+                    <button class="bg-white text-[#165DFF] border border-[#165DFF] px-6 py-3 rounded-lg font-medium btn-hover" onclick="scrollToSection('upload')">
+                        <i class="fa fa-video-camera mr-2"></i>视频上传
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <div class="feature-card bg-white rounded-xl p-6 shadow-md card-hover" onclick="showModal('officialModal')">
+                        <div class="w-16 h-16 rounded-full bg-[#165DFF]/10 flex items-center justify-center mb-4 mx-auto">
+                            <i class="fa fa-globe feature-icon text-3xl text-[#165DFF]"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-center">官方资源</h3>
+                        <p class="text-gray-600 text-center">
+                            直达Minecraft官方网站、下载页面和官方资源库，获取最新游戏资讯
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card bg-white rounded-xl p-6 shadow-md card-hover" onclick="showModal('communityModal')">
+                        <div class="w-16 h-16 rounded-full bg-[#36CFC9]/10 flex items-center justify-center mb-4 mx-auto">
+                            <i class="fa fa-users feature-icon text-3xl text-[#36CFC9]"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-center">社区论坛</h3>
+                        <p class="text-gray-600 text-center">
+                            探索热门Minecraft社区、论坛和玩家聚集地，与其他玩家交流心得
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card bg-white rounded-xl p-6 shadow-md card-hover" onclick="showModal('modsModal')">
+                        <div class="w-16 h-16 rounded-full bg-[#722ED1]/10 flex items-center justify-center mb-4 mx-auto">
+                            <i class="fa fa-cubes feature-icon text-3xl text-[#722ED1]"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-center">模组资源</h3>
+                        <p class="text-gray-600 text-center">
+                            发现海量模组、材质包和地图资源，丰富你的Minecraft游戏体验
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 网站导航部分 -->
+        <section id="resources" class="py-12 bg-white">
+            <div class="container mx-auto px-4 max-w-5xl">
+                <h2 class="text-3xl font-bold text-center mb-4 section-title">Minecraft资源导航</h2>
+                <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+                    以下是我们为您精心整理的Minecraft优质资源网站，点击即可快速访问
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 rounded-xl p-6 card-hover" onclick="openLink('https://www.minecraft.net')">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 rounded-lg bg-[#165DFF]/10 flex items-center justify-center mr-4">
+                                <i class="fa fa-gamepad text-2xl text-[#165DFF]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Minecraft官方网站</h3>
+                                <p class="text-gray-500">https://www.minecraft.net</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Minecraft国际版官方网站，提供游戏下载、最新资讯和官方消息。
+                        </p>
+                        <div class="inline-flex items-center text-[#165DFF] font-medium btn-hover">
+                            访问网站 <i class="fa fa-external-link ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 card-hover" onclick="openLink('https://www.curseforge.com/minecraft')">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 rounded-lg bg-[#165DFF]/10 flex items-center justify-center mr-4">
+                                <i class="fa fa-puzzle-piece text-2xl text-[#165DFF]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">CurseForge模组平台</h3>
+                                <p class="text-gray-500">https://www.curseforge.com/minecraft</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            最大的Minecraft模组资源库，提供数千个玩家制作的模组、材质包和地图。
+                        </p>
+                        <div class="inline-flex items-center text-[#165DFF] font-medium btn-hover">
+                            访问网站 <i class="fa fa-external-link ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 card-hover" onclick="openLink('https://www.mcbbs.net')">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 rounded-lg bg-[#165DFF]/10 flex items-center justify-center mr-4">
+                                <i class="fa fa-comments text-2xl text-[#165DFF]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Minecraft中文论坛</h3>
+                                <p class="text-gray-500">https://www.mcbbs.net</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            中文Minecraft玩家社区，提供资源下载、教程交流和服务器资讯。
+                        </p>
+                        <div class="inline-flex items-center text-[#165DFF] font-medium btn-hover">
+                            访问网站 <i class="fa fa-external-link ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 card-hover" onclick="openLink('https://www.planetminecraft.com')">
+                        <div class="flex items-start mb-4">
+                            <div class="w-12 h-12 rounded-lg bg-[#165DFF]/10 flex items-center justify-center mr-4">
+                                <i class="fa fa-picture-o text-2xl text-[#165DFF]"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Planet Minecraft</h3>
+                                <p class="text-gray-500">https://www.planetminecraft.com</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            创意资源分享平台，提供皮肤、材质包、建筑和艺术作品展示。
+                        </p>
+                        <div class="inline-flex items-center text-[#165DFF] font-medium btn-hover">
+                            访问网站 <i class="fa fa-external-link ml-2"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <button class="bg-[#165DFF] text-white px-6 py-3 rounded-lg font-medium btn-hover" onclick="showModal('moreResourcesModal')">
+                        <i class="fa fa-list mr-2"></i>查看全部资源网站
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 视频上传部分 -->
+        <section id="upload" class="py-16 bg-gradient-to-br from-[#165DFF] to-[#0E4ACC] text-white">
+            <div class="container mx-auto px-4 max-w-4xl text-center">
+                <h2 class="text-3xl font-bold mb-4">Minecraft视频上传系统</h2>
+                <p class="text-blue-100 mb-10 max-w-2xl mx-auto">
+                    分享您的Minecraft游戏精彩时刻，上传视频并与其他玩家一起交流
+                </p>
+                
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-8 mb-10">
+                    <div class="max-w-md mx-auto">
+                        <div class="border-2 border-dashed border-white/30 rounded-lg p-8 text-center mb-6 cursor-pointer" onclick="document.getElementById('fileUpload').click()">
+                            <i class="fa fa-cloud-upload text-4xl mb-4"></i>
+                            <p class="mb-4">拖放视频文件或点击上传</p>
+                            <button class="bg-white text-[#165DFF] px-5 py-2 rounded-lg font-medium btn-hover">
+                                <i class="fa fa-upload mr-2"></i>选择文件
+                            </button>
+                            <p class="text-sm mt-3 text-white/80">支持MP4、AVI格式，最大2GB</p>
+                            <input type="file" id="fileUpload" class="hidden" accept="video/*">
+                        </div>
+                        
+                        <div class="bg-white/5 rounded-lg p-4 text-left">
+                            <h3 class="font-medium mb-3">视频信息</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm mb-1">视频标题</label>
+                                    <input type="text" class="w-full bg-white/10 border border-white/20 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-white/50" placeholder="输入视频标题">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">视频描述</label>
+                                    <textarea class="w-full bg-white/10 border border-white/20 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-white/50" rows="2" placeholder="描述你的视频内容"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">游戏版本</label>
+                                    <select class="w-full bg-white/10 border border-white/20 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-white/50">
+                                        <option>Minecraft 1.19</option>
+                                        <option>Minecraft 1.18</option>
+                                        <option>Minecraft 1.17</option>
+                                        <option>其他版本</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="bg-white text-[#165DFF] px-8 py-3 rounded-lg font-medium btn-hover" onclick="uploadVideo()">
+                    <i class="fa fa-paper-plane mr-2"></i>提交视频
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-[#1D2129] text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-compass text-[#36CFC9] text-2xl"></i>
+                        <h2 class="text-xl font-bold">VFNTL导航系统</h2>
+                    </div>
+                    <p class="text-gray-400">
+                        专为Minecraft玩家打造的资源导航平台，提供一站式资源发现服务。
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">资源导航</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">官方资源</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">模组下载</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">社区论坛</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">皮肤材质</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">视频系统</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">上传视频</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">热门视频</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">视频分类</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">创作指南</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">帮助中心</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">意见反馈</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">关于我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#36CFC9]">加入我们</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>© 2023 VFNTL导航系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 模态框 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4">用户登录</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm mb-1">用户名</label>
+                    <input type="text" class="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#165DFF]">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">密码</label>
+                    <input type="password" class="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#165DFF]">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2">
+                        <span class="text-sm">记住我</span>
+                    </label>
+                    <a href="#" class="text-sm text-[#165DFF]">忘记密码?</a>
+                </div>
+                <button class="w-full bg-[#165DFF] text-white py-2 rounded-lg font-medium mt-4" onclick="hideModal('loginModal')">登录</button>
+                <p class="text-center text-sm mt-4">
+                    没有账号? <a href="#" class="text-[#165DFF]">立即注册</a>
+                </p>
+            </div>
+            <button class="absolute top-4 right-4 text-gray-500" onclick="hideModal('loginModal')">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="officialModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4">官方资源</h2>
+            <p class="text-gray-600 mb-4">
+                Minecraft官方资源包括游戏下载、更新、官方新闻和公告等。以下是一些重要的官方资源：
+            </p>
+            <ul class="list-disc pl-5 mb-4 text-gray-600">
+                <li>Minecraft官方网站 - 获取最新游戏资讯和下载</li>
+                <li>Minecraft启动器 - 下载和更新游戏</li>
+                <li>Minecraft商城 - 购买皮肤、材质包和世界</li>
+                <li>Minecraft教育版 - 教育用途的特殊版本</li>
+            </ul>
+            <button class="bg-[#165DFF] text-white px-4 py-2 rounded-lg" onclick="hideModal('officialModal')">关闭</button>
+        </div>
+    </div>
+
+    <div id="moreResourcesModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4">更多资源网站</h2>
+            <p class="text-gray-600 mb-4">
+                以下是更多优质的Minecraft资源网站：
+            </p>
+            <ul class="space-y-2 mb-4">
+                <li><a href="https://www.minecraftforum.net" class="text-[#165DFF]">Minecraft Forum</a> - 国际版论坛</li>
+                <li><a href="https://www.minecraftmaps.com" class="text-[#165DFF]">Minecraft Maps</a> - 地图分享平台</li>
+                <li><a href="https://www.minecraftskins.com" class="text-[#165DFF]">Minecraft Skins</a> - 皮肤资源网站</li>
+                <li><a href="https://www.curseforge.com/minecraft/texture-packs" class="text-[#165DFF]">CurseForge Texture Packs</a> - 材质包资源</li>
+            </ul>
+            <button class="bg-[#165DFF] text-white px-4 py-2 rounded-lg" onclick="hideModal('moreResourcesModal')">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // 显示模态框
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        // 隐藏模态框
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 切换移动端菜单
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // 滚动到指定区域
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 打开链接
+        function openLink(url) {
+            window.open(url, '_blank');
+        }
+        
+        // 上传视频功能
+        function uploadVideo() {
+            const fileInput = document.getElementById('fileUpload');
+            const titleInput = document.querySelector('input[type="text"]');
+            
+            if (fileInput.files.length === 0) {
+                alert('请先选择要上传的视频文件！');
+                return;
+            }
+            
+            if (!titleInput.value.trim()) {
+                alert('请输入视频标题！');
+                return;
+            }
+            
+            alert('视频上传成功！感谢您的分享。');
+            // 在实际应用中，这里会有上传文件的代码
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 打字机效果
+            setTimeout(function() {
+                document.querySelector('.typewriter h1').style.borderRight = 'none';
+            }, 3000);
+            
+            // 点击模态框外部关闭
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            
+            // 文件上传变更事件
+            document.getElementById('fileUpload').addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    alert(`已选择文件: ${this.files[0].name}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
